@@ -62,6 +62,16 @@ jobs:
                   cache-from: type=gha
                   cache-to: type=gha,mode=max
 
+            - name: Scan UI image for vulnerabilities
+              uses: aquasecurity/trivy-action@v0.36.0
+              with:
+                  image-ref: ui:ci
+                  format: table
+                  exit-code: "0"
+                  severity: HIGH,CRITICAL
+                  vuln-type: os,library
+                  ignore-unfixed: false
+
             - name: Start UI container
               run: |
                   docker run --detach --rm \
@@ -89,13 +99,3 @@ jobs:
             - name: Stop UI container
               if: always()
               run: docker stop ui-ci || true
-
-            - name: Scan UI image for vulnerabilities
-              uses: aquasecurity/trivy-action@v0.36.0
-              with:
-                  image-ref: ui:ci
-                  format: table
-                  exit-code: "0"
-                  severity: HIGH,CRITICAL
-                  vuln-type: os,library
-                  ignore-unfixed: false
