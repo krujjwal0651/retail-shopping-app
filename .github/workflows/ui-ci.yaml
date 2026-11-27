@@ -47,16 +47,40 @@ jobs:
             - name: Build and test
               run: ./mvnw --batch-mode --no-transfer-progress verify
 
-            - name: Set up Docker Buildx
-              uses: docker/setup-buildx-action@v4
-
             - name: Build container image
               uses: docker/build-push-action@v7
               with:
                   context: ./ui
+                  tags: ui:ci
+                  load: true
                   push: false
                   cache-from: type=gha
                   cache-to: type=gha,mode=max
 
-            - name: check list of docker images
-              run: docker images
+            - name: Start UI container
+              run: |
+                  docker run --detach --rm \
+                    --name ui-ci \
+                    --publish 8080:8080 \
+                    ui:ci
+
+            - name: Check UI container health
+              run: |
+                  for attempt in {1..30}; do
+                    if curl --fail --silent --show-error \
+                      http://localhost:8080/actuator/health; then
+                      exit 0
+                    fi
+                    sleep 2
+                  done
+
+                  echo "::error::UI container did not become healthy within 60 seconds."
+                  exit 1
+
+            - name: Show container logs on failure
+              if: failure()
+              run: docker logs ui-ci || true
+
+            - name: Stop UI container
+              if: always()
+              run: docker stop ui-ci || true
