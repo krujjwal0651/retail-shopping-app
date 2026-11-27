@@ -6,12 +6,12 @@ on:
         branches: [main]
         paths:
             - "ui/**"
-            - ".github/workflows/ui-ci.yml"
+            - ".github/workflows/ui-ci.yaml"
     push:
         branches: [main]
         paths:
             - "ui/**"
-            - ".github/workflows/ui-ci.yml"
+            - ".github/workflows/ui-ci.yaml"
 
 permissions:
     contents: read
