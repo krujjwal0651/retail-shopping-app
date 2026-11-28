@@ -140,5 +140,5 @@ jobs:
                   role-duration-seconds: 900
                   allowed-account-ids: 883017228092
 
-            - name: Confirm assumed AWS identity
+            - name: Confirm assumed AWS identity2
               run: aws sts get-caller-identity
