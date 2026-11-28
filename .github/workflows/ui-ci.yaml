@@ -111,15 +111,6 @@ jobs:
             id-token: write
 
         steps:
-            - name: Configure temporary AWS credentials
-              uses: aws-actions/configure-aws-credentials@v6.3.1
-              with:
-                  aws-region: us-east-1
-                  role-to-assume: arn:aws:iam::883017228092:role/retail-shopping-app-ui-ecr-push-main
-                  role-session-name: ui-ci-${{ github.run_id }}
-                  role-duration-seconds: 900
-                  allowed-account-ids: 883017228092
-
             - name: Display OIDC claims
               shell: bash
               run: |
@@ -139,6 +130,15 @@ jobs:
 
                   printf '%s' "$payload" | base64 --decode | jq \
                     '{aud, sub, repository, ref, event_name, environment}'
+
+            - name: Configure temporary AWS credentials
+              uses: aws-actions/configure-aws-credentials@v6.3.1
+              with:
+                  aws-region: us-east-1
+                  role-to-assume: arn:aws:iam::883017228092:role/retail-shopping-app-ui-ecr-push-main
+                  role-session-name: ui-ci-${{ github.run_id }}
+                  role-duration-seconds: 900
+                  allowed-account-ids: 883017228092
 
             - name: Confirm assumed AWS identity
               run: aws sts get-caller-identity
