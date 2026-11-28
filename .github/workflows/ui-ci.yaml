@@ -76,6 +76,23 @@ jobs:
                   vuln-type: os,library
                   ignore-unfixed: false
 
+            - name: Generate UI SBOM
+              uses: aquasecurity/trivy-action@v0.36.0
+              with:
+                  image-ref: ui:ci
+                  format: cyclonedx
+                  output: ui-sbom.cdx.json
+                  exit-code: "0"
+                  skip-setup-trivy: true
+
+            - name: Upload UI SBOM
+              uses: actions/upload-artifact@v4
+              with:
+                  name: ui-sbom-${{ github.sha }}
+                  path: ui-sbom.cdx.json
+                  if-no-files-found: error
+                  retention-days: 90
+
             - name: Start UI container
               run: |
                   docker run --detach --rm \
