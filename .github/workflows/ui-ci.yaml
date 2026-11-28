@@ -1,7 +1,6 @@
 name: CI workflow for UI
 
 on:
-    workflow_dispatch:
     pull_request:
         branches: [main]
         paths:
@@ -23,7 +22,6 @@ concurrency:
 jobs:
     test:
         name: Test and package UI
-        environment: AWS
         runs-on: ubuntu-24.04
         timeout-minutes: 15
 
