@@ -125,11 +125,11 @@ jobs:
               if: github.event_name == 'push' && github.ref == 'refs/heads/main'
               uses: aws-actions/configure-aws-credentials@v6.3.1
               with:
-                  aws-region: us-east-1
-                  role-to-assume: arn:aws:iam::883017228092:role/retail-shopping-app-ui-ecr-push-main
+                  aws-region: ${{ vars.AWS_REGION }}
+                  role-to-assume: ${{ vars.AWS_ROLE_ARN }}
                   role-session-name: ui-ci-${{ github.run_id }}
                   role-duration-seconds: 900
-                  allowed-account-ids: 883017228092
+                  allowed-account-ids: ${{ vars.AWS_ACCOUNT_ID }}
 
             - name: Log in to Amazon ECR
               if: github.event_name == 'push' && github.ref == 'refs/heads/main'
@@ -140,7 +140,7 @@ jobs:
               if: github.event_name == 'push' && github.ref == 'refs/heads/main'
               id: image-exists
               env:
-                  ECR_REPOSITORY: retail_shopping_app/ui
+                  ECR_REPOSITORY: ${{ vars.ECR_REPOSITORY }}
                   IMAGE_TAG: sha-${{ github.sha }}
               run: |
                   if aws ecr describe-images \
@@ -157,7 +157,7 @@ jobs:
               if: github.event_name == 'push' && github.ref == 'refs/heads/main' && steps.image-exists.outputs.exists != 'true'
               env:
                   ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-                  ECR_REPOSITORY: retail_shopping_app/ui
+                  ECR_REPOSITORY: ${{ vars.ECR_REPOSITORY }}
                   IMAGE_TAG: sha-${{ github.sha }}
               run: |
                   IMAGE_URI="${ECR_REGISTRY}/${ECR_REPOSITORY}:${IMAGE_TAG}"
