@@ -99,3 +99,26 @@ jobs:
             - name: Stop UI container
               if: always()
               run: docker stop ui-ci || true
+
+    verify-aws-oidc:
+        name: Verify AWS OIDC access
+        needs: test
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+        runs-on: ubuntu-24.04
+        timeout-minutes: 5
+
+        permissions:
+            id-token: write
+
+        steps:
+            - name: Configure temporary AWS credentials
+              uses: aws-actions/configure-aws-credentials@v6.3.1
+              with:
+                  aws-region: us-east-1
+                  role-to-assume: arn:aws:iam::883017228092:role/retail-shopping-app-ui-ecr-push-main
+                  role-session-name: ui-ci-${{ github.run_id }}
+                  role-duration-seconds: 900
+                  allowed-account-ids: 883017228092
+
+            - name: Confirm assumed AWS identity
+              run: aws sts get-caller-identity
