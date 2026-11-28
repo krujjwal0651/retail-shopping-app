@@ -1,4 +1,4 @@
-name: UI CI
+name: CI workflow for UI
 
 on:
     workflow_dispatch:
